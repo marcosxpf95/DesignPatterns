@@ -13,7 +13,7 @@ namespace JogoDaVelha
 {
     public partial class Form1 : Form
     {
-        Tabuleiro _tabuleiro = null;
+        Tabuleiro tabuleiro = null;
 
         public Form1()
         {
@@ -24,15 +24,15 @@ namespace JogoDaVelha
         private void carregarVisual()
         {
             Tabuleiro.AlterarPlacar alterarPlacar = new Tabuleiro.AlterarPlacar(AlterarPlacar);
-            _tabuleiro = new Tabuleiro(alterarPlacar);
-            this.tableLayoutPanelTabuleiro.Controls.Add(_tabuleiro);
-            _tabuleiro.Dock = DockStyle.Fill;
+            tabuleiro = new Tabuleiro(alterarPlacar);
+            this.tableLayoutPanelTabuleiro.Controls.Add(tabuleiro);
+            tabuleiro.Dock = DockStyle.Fill;
             labelPlacar.Text = "JOGADOR X: 0\n\nJOGADOR O: 0";
         }
 
         private void reset(object sender, EventArgs e)
         {
-            _tabuleiro.ResetTabuleiro();
+            tabuleiro.ResetTabuleiro();
         }
 
         public void AlterarPlacar(string placar)
@@ -42,7 +42,7 @@ namespace JogoDaVelha
 
         private void desfazerJogada(object sender, EventArgs e)
         {
-            _tabuleiro.desfazerJogada();
+            tabuleiro.desfazerJogada();
         }
     }
 }

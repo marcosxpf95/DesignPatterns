@@ -13,19 +13,18 @@ namespace JogoDaVelha
 {
     public partial class Tabuleiro : UserControl
     {
-        private bool _jogadaPar = true;
-        private int _vitoriasX = 0;
-        private int _vitoriasO = 0;
-        private Jogadas _jogadas;
-        private CareTakerJogadas _careTakerJogadas;
-        private int _quantidadeJogadas = 1;
+        private int vitoriasX = 0;
+        private int vitoriasO = 0;
+        private Jogadas jogadas;
+        private CareTakerJogadas careTakerJogadas;
+        private int quantidadeJogadas = 0;
 
         public delegate void AlterarPlacar(string placar);
         AlterarPlacar alterarPlacar;
         public Tabuleiro(AlterarPlacar alterarPlacar)
         {
-            _jogadas = new Jogadas();
-            _careTakerJogadas = new CareTakerJogadas();
+            jogadas = new Jogadas();
+            careTakerJogadas = new CareTakerJogadas();
             this.alterarPlacar = alterarPlacar;
             InitializeComponent();
         }
@@ -34,26 +33,24 @@ namespace JogoDaVelha
         {
             Label position = (Label)sender;
 
-            if (string.IsNullOrEmpty(position.Text) && _jogadaPar)
+            if (string.IsNullOrEmpty(position.Text) && jogadas.jogadarPar)
             {
                 position.Text = "X";
-                _jogadaPar = false;
-                _jogadas.SetJogadas(position.Name, "X");
-                _careTakerJogadas.Add(_jogadas.CreateMementoJogadas());
+                careTakerJogadas.Add(jogadas.CreateMementoJogadas());
+                jogadas.SetJogadas(position.Name, "X");
                 this.Refresh();
                 verificarResultado();
             }
-            else if (string.IsNullOrEmpty(position.Text) && !_jogadaPar)
+            else if (string.IsNullOrEmpty(position.Text) && !jogadas.jogadarPar)
             {
                 position.Text = "O";
-                _jogadaPar = true;
-                _jogadas.SetJogadas(position.Name, "O");
-                _careTakerJogadas.Add(_jogadas.CreateMementoJogadas());
+                careTakerJogadas.Add(jogadas.CreateMementoJogadas());
+                jogadas.SetJogadas(position.Name, "O");
                 this.Refresh();
                 verificarResultado();
             }
 
-            _quantidadeJogadas++;
+            quantidadeJogadas++;
         }
 
         private void verificarResultado()
@@ -68,36 +65,80 @@ namespace JogoDaVelha
             
         }
 
+        /*
+        private void Verificar(int rowStep, int columnStep)
+        {
+            string lastValue = null;
+
+            for (var i = 0; i <= 2; i += rowStep)
+            {
+                for (var i = 0; i <= 2; i += columnStep)
+                {
+                    
+                }
+            }
+            for (int contColumn = 0; contColumn <= 2; contColumn++)
+            {
+                var positionText = tableLayoutPanel1.GetControlFromPosition(contColumn, 0).Text;
+
+                if (!string.IsNullOrEmpty(positionText) &&
+                    positionText == tableLayoutPanel1.GetControlFromPosition(contColumn, 1).Text &&
+                    positionText == tableLayoutPanel1.GetControlFromPosition(contColumn, 2).Text)
+                {
+                    marcarVetorVencedor(contColumn, 0, contColumn, 1, contColumn, 2);
+                    if (showWinMessage(positionText))
+                        ResetTabuleiro();
+                    else
+                        this.Enabled = false;
+
+                    contabilizarVitoria(positionText);
+                }
+            }
+        }
+        */
+        
         private void VerificarVertical()
         {
             for (int contColumn = 0; contColumn <= 2; contColumn++)
             {
-                if (tableLayoutPanel1.GetControlFromPosition(contColumn, 0).Text.Equals("X") &&
-                    tableLayoutPanel1.GetControlFromPosition(contColumn, 1).Text.Equals("X") &&
-                    tableLayoutPanel1.GetControlFromPosition(contColumn, 2).Text.Equals("X"))
+                var positionText = tableLayoutPanel1.GetControlFromPosition(contColumn, 0).Text;
+               
+                if (!string.IsNullOrEmpty(positionText) && 
+                    positionText == tableLayoutPanel1.GetControlFromPosition(contColumn, 1).Text &&
+                    positionText == tableLayoutPanel1.GetControlFromPosition(contColumn, 2).Text)
                 {
                     marcarVetorVencedor(contColumn, 0, contColumn, 1, contColumn, 2);
-                    if (showWinMessage("X"))
+                    if (showWinMessage(positionText))
                         ResetTabuleiro();
                     else
                         this.Enabled = false;
 
-                    contabilizarVitoria("X");
+                    contabilizarVitoria(positionText);
                 }
-                else 
-                if (tableLayoutPanel1.GetControlFromPosition(contColumn, 0).Text.Equals("O") &&
-                    tableLayoutPanel1.GetControlFromPosition(contColumn, 1).Text.Equals("O") &&
-                    tableLayoutPanel1.GetControlFromPosition(contColumn, 2).Text.Equals("O"))
+            }
+        }
 
+
+        private void verificarHorizontal()
+        {
+            for (int contRow = 0; contRow <= 2; contRow++)
+            {
+                var positionText = tableLayoutPanel1.GetControlFromPosition(0, contRow).Text;
+
+                if (!string.IsNullOrEmpty(positionText) &&
+                    tableLayoutPanel1.GetControlFromPosition(1, contRow).Text.Equals(positionText) &&
+                    tableLayoutPanel1.GetControlFromPosition(2, contRow).Text.Equals(positionText))
                 {
-                    marcarVetorVencedor(contColumn, 0, contColumn, 1, contColumn, 2);
+                    marcarVetorVencedor(0, contRow, 1, contRow, 2, contRow);
 
-                    if (showWinMessage("O"))
+                    if (showWinMessage(positionText))
                         ResetTabuleiro();
                     else
+                    {
                         this.Enabled = false;
+                    }
 
-                    contabilizarVitoria("O");
+                    contabilizarVitoria(positionText);
                 }
             }
         }
@@ -105,50 +146,12 @@ namespace JogoDaVelha
         private void contabilizarVitoria(string jogador)
         {
             if (jogador.Equals("X"))
-                _vitoriasX++;
+                vitoriasX += 1;
             else
-                _vitoriasO++;
+                vitoriasO += 1;
 
-            alterarPlacar.Invoke($"JOGADOR X: {_vitoriasX}\n\nJOGADOR O: {_vitoriasO}");
+            alterarPlacar.Invoke($"JOGADOR X: {vitoriasX}\n\nJOGADOR O: {vitoriasO}");
         }   
-
-        private void verificarHorizontal()
-        {
-            for (int contRow = 0; contRow <= 2; contRow++)
-            {
-                if (tableLayoutPanel1.GetControlFromPosition(0, contRow).Text.Equals("X") &&
-                    tableLayoutPanel1.GetControlFromPosition(1, contRow).Text.Equals("X") &&
-                    tableLayoutPanel1.GetControlFromPosition(2, contRow).Text.Equals("X"))
-                {
-                    marcarVetorVencedor(0, contRow, 1, contRow, 2, contRow);
-
-                    if (showWinMessage("X"))
-                        ResetTabuleiro();
-                    else
-                    {
-                        this.Enabled = false;
-                    }
-
-                    contabilizarVitoria("X");
-                }
-                else
-                if (tableLayoutPanel1.GetControlFromPosition(0, contRow).Text.Equals("O") &&
-                    tableLayoutPanel1.GetControlFromPosition(1, contRow).Text.Equals("O") &&
-                    tableLayoutPanel1.GetControlFromPosition(2, contRow).Text.Equals("O"))
-                {
-                    marcarVetorVencedor(0, contRow, 1, contRow, 2, contRow);
-
-                    if (showWinMessage("O"))
-                        ResetTabuleiro();
-                    else
-                    {
-                        this.Enabled = false;
-                    }
-
-                    contabilizarVitoria("O");
-                }
-            }
-        }
 
         private bool showWinMessage(string jogador)
         {
@@ -197,24 +200,24 @@ namespace JogoDaVelha
             label8.BackColor = Color.Transparent;
             label9.BackColor = Color.Transparent;
             this.Enabled = true;
-            _vitoriasO = 0;
-            _vitoriasX = 0;
-
-            alterarPlacar.Invoke($"JOGADOR X: {_vitoriasX}\n\nJOGADOR O: {_vitoriasO}");
+            jogadas.jogadas.Clear();
+            careTakerJogadas.mementosJogadas.Clear();
+            quantidadeJogadas = 0;
+            alterarPlacar.Invoke($"JOGADOR X: {vitoriasX}\n\nJOGADOR O: {vitoriasO}");
         }
 
         public void desfazerJogada()
         {
-            if (_quantidadeJogadas > 0)
+            if (quantidadeJogadas > 0)
             {
-                _quantidadeJogadas--;
-                if (_quantidadeJogadas > 0)
-                    _jogadas.SetMemento(_careTakerJogadas.Get(_quantidadeJogadas - 1));
-                else
-                    _jogadas.SetMemento(_careTakerJogadas.Get(_quantidadeJogadas));
-                
-                atualizarMarcacoes();
+                quantidadeJogadas--;                   
+                jogadas.SetMemento(careTakerJogadas.Get());
             }
+            //else
+            //    _jogadas.SetMemento(_careTakerJogadas.Get(_quantidadeJogadas));
+                
+            atualizarMarcacoes();
+            
         }
 
         public void atualizarMarcacoes()
@@ -223,7 +226,7 @@ namespace JogoDaVelha
             {
                 Label label = (Label)item;
                 
-                if (!_jogadas._jogadas.ContainsKey(label.Name))
+                if (!jogadas.jogadas.ContainsKey(label.Name))
                 {
                     label.Text = "";
                     label.BackColor = Color.Transparent;

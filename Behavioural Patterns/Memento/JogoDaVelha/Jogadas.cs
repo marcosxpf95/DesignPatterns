@@ -9,17 +9,21 @@ namespace JogoDaVelha
 {
     public class Jogadas
     {
-        public Dictionary<string, string> _jogadas { get; private set; }
+        public Dictionary<string, string> jogadas { get; private set; }
+        public bool jogadarPar { get; private set; }
 
         public Jogadas()
         {
-            _jogadas = new Dictionary<string, string>();
+            jogadas = new Dictionary<string, string>();
+            jogadarPar =true;
         }
 
         public void SetJogadas(string label, string jogador)
         {
-            if (!_jogadas.ContainsKey(label))
-                _jogadas.Add(label, jogador);
+            if (!jogadas.ContainsKey(label))
+                jogadas.Add(label, jogador);
+
+            jogadarPar = !jogadarPar;
         }
 
         public MementoJogadas CreateMementoJogadas()
@@ -29,7 +33,8 @@ namespace JogoDaVelha
 
         public void SetMemento(MementoJogadas memento)
         {
-            this._jogadas = memento.mementoJogadas;
+            this.jogadas = memento.mementoJogadas;
+            this.jogadarPar = memento.jogadaPar;
         }
     }
 }
