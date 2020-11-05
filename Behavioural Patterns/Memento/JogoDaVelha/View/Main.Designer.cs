@@ -1,6 +1,6 @@
 ﻿namespace JogoDaVelha
 {
-    partial class Form1
+    partial class JogoDaVelha
     {
         /// <summary>
         /// Required designer variable.
@@ -107,7 +107,7 @@
             this.buttonDesfazerJogada.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.buttonDesfazerJogada.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             this.buttonDesfazerJogada.UseVisualStyleBackColor = true;
-            this.buttonDesfazerJogada.Click += new System.EventHandler(this.reset);
+            this.buttonDesfazerJogada.Click += new System.EventHandler(this.resetarJogo);
             // 
             // labelPlacar
             // 

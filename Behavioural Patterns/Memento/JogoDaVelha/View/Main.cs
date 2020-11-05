@@ -11,11 +11,11 @@ using System.Windows.Forms;
 
 namespace JogoDaVelha
 {
-    public partial class Form1 : Form
+    public partial class JogoDaVelha : Form
     {
         Tabuleiro tabuleiro = null;
 
-        public Form1()
+        public JogoDaVelha()
         {
             InitializeComponent();
             carregarVisual();
@@ -23,26 +23,26 @@ namespace JogoDaVelha
 
         private void carregarVisual()
         {
-            Tabuleiro.AlterarPlacar alterarPlacar = new Tabuleiro.AlterarPlacar(AlterarPlacar);
-            tabuleiro = new Tabuleiro(alterarPlacar);
+            Tabuleiro.AtualizarPlacar atualizarPlacar = new Tabuleiro.AtualizarPlacar(setPlacar);
+            tabuleiro = new Tabuleiro(atualizarPlacar);
             this.tableLayoutPanelTabuleiro.Controls.Add(tabuleiro);
             tabuleiro.Dock = DockStyle.Fill;
             labelPlacar.Text = "JOGADOR X: 0\n\nJOGADOR O: 0";
         }
 
-        private void reset(object sender, EventArgs e)
+        private void resetarJogo(object sender, EventArgs e)
         {
-            tabuleiro.ResetTabuleiro();
+            tabuleiro.ResetarTabuleiro();
         }
 
-        public void AlterarPlacar(string placar)
+        public void setPlacar(string placar)
         {
             labelPlacar.Text = placar;
         }
 
         private void desfazerJogada(object sender, EventArgs e)
         {
-            tabuleiro.desfazerJogada();
+            tabuleiro.DesfazerJogada();
         }
     }
 }

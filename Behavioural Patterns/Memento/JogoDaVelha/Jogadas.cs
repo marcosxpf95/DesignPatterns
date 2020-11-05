@@ -15,7 +15,7 @@ namespace JogoDaVelha
         public Jogadas()
         {
             jogadas = new Dictionary<string, string>();
-            jogadarPar =true;
+            jogadarPar = true;
         }
 
         public void SetJogadas(string label, string jogador)

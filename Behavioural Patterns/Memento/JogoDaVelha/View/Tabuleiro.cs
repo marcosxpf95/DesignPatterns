@@ -19,17 +19,18 @@ namespace JogoDaVelha
         private CareTakerJogadas careTakerJogadas;
         private int quantidadeJogadas = 0;
 
-        public delegate void AlterarPlacar(string placar);
-        AlterarPlacar alterarPlacar;
-        public Tabuleiro(AlterarPlacar alterarPlacar)
+        public delegate void AtualizarPlacar(string placar);
+        AtualizarPlacar atualizarPlacar;
+        
+        public Tabuleiro(AtualizarPlacar atualizarPlacar)
         {
             jogadas = new Jogadas();
             careTakerJogadas = new CareTakerJogadas();
-            this.alterarPlacar = alterarPlacar;
+            this.atualizarPlacar = atualizarPlacar;
             InitializeComponent();
         }
 
-        private void selectCell(object sender, EventArgs e)
+        private void selecionarCell(object sender, EventArgs e)
         {
             Label position = (Label)sender;
 
@@ -39,7 +40,6 @@ namespace JogoDaVelha
                 careTakerJogadas.Add(jogadas.CreateMementoJogadas());
                 jogadas.SetJogadas(position.Name, "X");
                 this.Refresh();
-                verificarResultado();
             }
             else if (string.IsNullOrEmpty(position.Text) && !jogadas.jogadarPar)
             {
@@ -47,125 +47,135 @@ namespace JogoDaVelha
                 careTakerJogadas.Add(jogadas.CreateMementoJogadas());
                 jogadas.SetJogadas(position.Name, "O");
                 this.Refresh();
-                verificarResultado();
             }
 
-            quantidadeJogadas++;
-        }
-
-        private void verificarResultado()
-        {
-            verificarHorizontal();
-            VerificarVertical();
-            verificarDiagonal();
-        }
-
-        private void verificarDiagonal()
-        {
-            
-        }
-
-        /*
-        private void Verificar(int rowStep, int columnStep)
-        {
-            string lastValue = null;
-
-            for (var i = 0; i <= 2; i += rowStep)
+            if (existeVencedor())
             {
-                for (var i = 0; i <= 2; i += columnStep)
-                {
-                    
-                }
+                if (exibirMensagemVencedor(position.Text))
+                    ResetarTabuleiro();
+                else
+                    this.Enabled = false;
             }
-            for (int contColumn = 0; contColumn <= 2; contColumn++)
+            else
             {
-                var positionText = tableLayoutPanel1.GetControlFromPosition(contColumn, 0).Text;
+                quantidadeJogadas++;
 
-                if (!string.IsNullOrEmpty(positionText) &&
-                    positionText == tableLayoutPanel1.GetControlFromPosition(contColumn, 1).Text &&
-                    positionText == tableLayoutPanel1.GetControlFromPosition(contColumn, 2).Text)
+                if (resultouEmVelha(quantidadeJogadas))
                 {
-                    marcarVetorVencedor(contColumn, 0, contColumn, 1, contColumn, 2);
-                    if (showWinMessage(positionText))
-                        ResetTabuleiro();
+                    if (exibirMensagemVelha())
+                        ResetarTabuleiro();
                     else
                         this.Enabled = false;
-
-                    contabilizarVitoria(positionText);
                 }
             }
-        }
-        */
-        
-        private void VerificarVertical()
-        {
-            for (int contColumn = 0; contColumn <= 2; contColumn++)
-            {
-                var positionText = tableLayoutPanel1.GetControlFromPosition(contColumn, 0).Text;
-               
-                if (!string.IsNullOrEmpty(positionText) && 
-                    positionText == tableLayoutPanel1.GetControlFromPosition(contColumn, 1).Text &&
-                    positionText == tableLayoutPanel1.GetControlFromPosition(contColumn, 2).Text)
-                {
-                    marcarVetorVencedor(contColumn, 0, contColumn, 1, contColumn, 2);
-                    if (showWinMessage(positionText))
-                        ResetTabuleiro();
-                    else
-                        this.Enabled = false;
 
-                    contabilizarVitoria(positionText);
-                }
-            }
+            atualizarPlacar.Invoke($"JOGADOR X: {vitoriasX}\n\nJOGADOR O: {vitoriasO}");
         }
 
-
-        private void verificarHorizontal()
+        private bool existeVencedor()
         {
-            for (int contRow = 0; contRow <= 2; contRow++)
+            string positionText;
+
+            for (var i = 3; i <= 18; i += 3)
             {
-                var positionText = tableLayoutPanel1.GetControlFromPosition(0, contRow).Text;
-
-                if (!string.IsNullOrEmpty(positionText) &&
-                    tableLayoutPanel1.GetControlFromPosition(1, contRow).Text.Equals(positionText) &&
-                    tableLayoutPanel1.GetControlFromPosition(2, contRow).Text.Equals(positionText))
+                if (i <= 9)
                 {
-                    marcarVetorVencedor(0, contRow, 1, contRow, 2, contRow);
+                    int linha = (i / 3) - 1;
 
-                    if (showWinMessage(positionText))
-                        ResetTabuleiro();
-                    else
+                    positionText = tableLayoutPanel1.GetControlFromPosition(0, linha).Text;
+
+                    if (!string.IsNullOrEmpty(positionText) &&
+                    positionText == tableLayoutPanel1.GetControlFromPosition(1, linha).Text &&
+                    positionText == tableLayoutPanel1.GetControlFromPosition(2, linha).Text)
                     {
-                        this.Enabled = false;
+                        marcarVetorVencedor(0, linha, 1, linha, 2, linha);
+                        contabilizarVitorias(positionText);
+                        return true;
                     }
 
-                    contabilizarVitoria(positionText);
+                    if (linha == 1)
+                    {
+                        positionText = tableLayoutPanel1.GetControlFromPosition(1, linha).Text;
+
+                        if (!string.IsNullOrEmpty(positionText) &&
+                        positionText == tableLayoutPanel1.GetControlFromPosition(0, 0).Text &&
+                        positionText == tableLayoutPanel1.GetControlFromPosition(2, 2).Text)
+                        {
+                            marcarVetorVencedor(0, 0, 1, linha, 2, 2);
+                            contabilizarVitorias(positionText);
+                            return true;
+                        }
+                        else if (!string.IsNullOrEmpty(positionText) &&
+                        positionText == tableLayoutPanel1.GetControlFromPosition(2, 0).Text &&
+                        positionText == tableLayoutPanel1.GetControlFromPosition(0, 2).Text)
+                        {
+                            marcarVetorVencedor(2, 0, 1, linha, 0, 2);
+                            contabilizarVitorias(positionText);
+                            return true;
+                        }
+                    }
                 }
+                else
+                {
+                    int coluna = ((i - 9) / 3) - 1;
+
+                    positionText = tableLayoutPanel1.GetControlFromPosition(coluna, 0).Text;
+
+                    if (!string.IsNullOrEmpty(positionText) &&
+                    positionText == tableLayoutPanel1.GetControlFromPosition(coluna, 1).Text &&
+                    positionText == tableLayoutPanel1.GetControlFromPosition(coluna, 2).Text)
+                    {
+                        marcarVetorVencedor(coluna, 0, coluna, 1, coluna, 2);
+                        contabilizarVitorias(positionText);
+                        return true;
+                    }
+                }                
             }
+
+            return false;
         }
 
-        private void contabilizarVitoria(string jogador)
+        public bool resultouEmVelha(int quantidadeJogada)
+        {
+            return quantidadeJogada == 9;
+        }
+
+        private void contabilizarVitorias(string jogador)
         {
             if (jogador.Equals("X"))
                 vitoriasX += 1;
             else
                 vitoriasO += 1;
-
-            alterarPlacar.Invoke($"JOGADOR X: {vitoriasX}\n\nJOGADOR O: {vitoriasO}");
         }   
 
-        private bool showWinMessage(string jogador)
+        private bool exibirMensagemVencedor(string jogador)
         {
-            string message = $"Jogador {jogador} ganhou. Deseja jogar outra vez?";
-            string caption = "Error Detected in Input";
+            string mensagem = $"Jogador {jogador} ganhou. Deseja jogar outra vez?";
+            string titulo = "Parabéns!!!";
             MessageBoxButtons buttons = MessageBoxButtons.YesNo;
-            DialogResult result;
+            DialogResult resultado;
 
-            // Displays the MessageBox.
-            result = MessageBox.Show(message, caption, buttons);
+            resultado = MessageBox.Show(mensagem, titulo, buttons);
             
-            if (result == System.Windows.Forms.DialogResult.Yes)
+            if (resultado == System.Windows.Forms.DialogResult.Yes)
             {
-                // Closes the parent form.
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool exibirMensagemVelha()
+        {
+            string mensagem = "O Jogo deu velha. Deseja jogar outra vez?";
+            string titulo = "Não foi dessa vez.";
+            MessageBoxButtons botoes = MessageBoxButtons.YesNo;
+            DialogResult resultado;
+
+            resultado = MessageBox.Show(mensagem, titulo, botoes);
+
+            if (resultado == System.Windows.Forms.DialogResult.Yes)
+            {
                 return true;
             }
 
@@ -179,7 +189,7 @@ namespace JogoDaVelha
             tableLayoutPanel1.GetControlFromPosition(terceiraPosicaoColuna, terceiraPosicaoLinha).BackColor = Color.Yellow;
         }
 
-        public void ResetTabuleiro()
+        public void ResetarTabuleiro()
         {
             label1.Text = "";
             label2.Text = "";
@@ -203,24 +213,21 @@ namespace JogoDaVelha
             jogadas.jogadas.Clear();
             careTakerJogadas.mementosJogadas.Clear();
             quantidadeJogadas = 0;
-            alterarPlacar.Invoke($"JOGADOR X: {vitoriasX}\n\nJOGADOR O: {vitoriasO}");
+            atualizarPlacar.Invoke($"JOGADOR X: {vitoriasX}\n\nJOGADOR O: {vitoriasO}");
         }
 
-        public void desfazerJogada()
+        public void DesfazerJogada()
         {
             if (quantidadeJogadas > 0)
             {
                 quantidadeJogadas--;                   
                 jogadas.SetMemento(careTakerJogadas.Get());
             }
-            //else
-            //    _jogadas.SetMemento(_careTakerJogadas.Get(_quantidadeJogadas));
-                
-            atualizarMarcacoes();
-            
+           
+            AtualizarMarcacoes();
         }
 
-        public void atualizarMarcacoes()
+        public void AtualizarMarcacoes()
         {
             foreach (Control item in tableLayoutPanel1.Controls)
             {
