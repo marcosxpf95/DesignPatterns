@@ -7,7 +7,9 @@ namespace Loja
     public class Compra
     {
         private Desconto desconto { get; set; }
-        public double valor { get; private set; }
+        public double valor { get; set; }
+
+        public Compra() { }
 
         public Compra(Desconto desconto)
         {
