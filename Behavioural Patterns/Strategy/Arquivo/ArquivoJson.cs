@@ -21,10 +21,9 @@ namespace Arquivo
             {
                 var jsonString = File.ReadAllText(diretorio + "//Compra.json");
 
-                if (string.IsNullOrEmpty(jsonString))
-                {
+                if (!string.IsNullOrEmpty(jsonString))                
                     return JsonSerializer.Deserialize<Compra>(jsonString);                    
-                }
+                
             }
             catch(Exception ex)
             {
@@ -38,6 +37,20 @@ namespace Arquivo
         {
             try
             {
+                var path = diretorio + "//Compra.json";
+
+                using (FileStream file = File.Create(path))
+                {
+                    file.Close();
+                }
+
+                var json = JsonSerializer.Serialize(compra);
+
+                using (StreamWriter writer = new StreamWriter(diretorio + "//Compra.json", true))
+                {
+                    writer.WriteLine(json);
+                    writer.Close();
+                }
                 
             }
             catch(Exception ex)
@@ -48,7 +61,18 @@ namespace Arquivo
 
         public string PegarArquivo()
         {
-            throw new NotImplementedException();
+            string arquivo = string.Empty;
+
+            try
+            {
+                 arquivo = File.ReadAllText(diretorio + "//Compra.json");
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine("Error: " + ex);
+            }
+
+            return arquivo;
         }
     }
 }

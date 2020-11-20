@@ -22,9 +22,13 @@ namespace Arquivo
             try
             {
                 FileStream stream = new FileStream(diretorio + "//Compra.xml", FileMode.Open);                
+                
                 XmlSerializer desserializador = new XmlSerializer(typeof(Compra));
+                
                 Compra compra = (Compra)desserializador.Deserialize(stream);
                 
+                stream.Close();
+
                 return compra;
             }
             catch(Exception ex)
@@ -59,13 +63,7 @@ namespace Arquivo
 
             try
             {
-                FileStream stream = new FileStream(diretorio + "//Compra.xml", FileMode.Open);
-                XmlTextReader linha = new XmlTextReader(stream);
-
-                while (linha.Read())
-                {
-                    arquivo += linha.Value;    
-                }
+                arquivo = File.ReadAllText(diretorio + "//Compra.xml");
             }
             catch(Exception ex)
             {

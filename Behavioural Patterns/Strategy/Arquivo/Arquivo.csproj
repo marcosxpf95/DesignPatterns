@@ -8,5 +8,5 @@
   <ItemGroup>
     <ProjectReference Include="..\Loja\Loja.csproj" />
   </ItemGroup>
-
+  
 </Project>

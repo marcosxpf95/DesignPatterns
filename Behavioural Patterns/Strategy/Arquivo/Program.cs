@@ -5,10 +5,13 @@ namespace Arquivo
 {
     class Program
     {        
-        static string DIRETORIO = "file";        
+        static string DIRETORIO = "file";
+        static GerenciadorArquivoCompra gerenciadorArquivoXml = new GerenciadorArquivoCompra(new ArquivoXML(DIRETORIO));
+        static GerenciadorArquivoCompra gerenciadorArquivoJson = new GerenciadorArquivoCompra(new ArquivoJson(DIRETORIO));     
         static void Main(string[] args)
         {
             Compra compra = null;
+            
             
             while(true)
             {
@@ -34,24 +37,29 @@ namespace Arquivo
             {
                 case 1:
                     if (compra == null)
+                    {
                         compra = iniciarCompra();                    
+                        Console.WriteLine("Compra iniciada com sucesso"); 
+                    }
                     else
                         Console.WriteLine("Já existe compra iniciada");
-
-                    Console.WriteLine("Compra iniciada com sucesso");                    
+                                    
                     break;
 
                 case 2:                    
-                    compra = recuperarCompraArquivoXml();
+                    compra = gerenciadorArquivoXml.RetornarCompraDeArquivo();
                     
                     if (compra != null)
-                    {
-                        Console.WriteLine("Dados carregados com sucesso.\nDados do Arquivo:\n" + recuperarTextoArquivoXml());                            
-                    }
+                        Console.WriteLine("Dados carregados com sucesso.\nDados do Arquivo:\n" + gerenciadorArquivoXml.RecuperarTextoArquivoDeCompra());                            
+                    
                     break;
 
                 case 3:
-                    Console.WriteLine("not implemented");
+                    compra = gerenciadorArquivoJson.RetornarCompraDeArquivo();
+
+                    if (compra != null)
+                        Console.WriteLine("Dados carregados com sucesso.\n Dados do Arquivo \n" + gerenciadorArquivoJson.RecuperarTextoArquivoDeCompra());
+
                     break;
 
                 case 4:
@@ -69,12 +77,13 @@ namespace Arquivo
 
                 case 6:
                     if (compra != null)
-                        gravarCompraArquivoXML(compra);
+                        gerenciadorArquivoXml.GerarArquivoDeCompra(compra);
 
                     break;
 
                 case 7:
-                    Console.WriteLine("not implemented");
+                    if (compra != null)
+                        gerenciadorArquivoJson.GerarArquivoDeCompra(compra);
 
                     break;
 
@@ -90,18 +99,6 @@ namespace Arquivo
             }
         }
 
-        private static string recuperarTextoArquivoXml()
-        {
-            GerenciadorArquivoCompra gerenciadorArquivoCompraXML = new GerenciadorArquivoCompra(new ArquivoXML(DIRETORIO));
-            return gerenciadorArquivoCompraXML.RecuperarTextoArquivoDeCompra();
-        }
-
-        private static void gravarCompraArquivoXML(Compra compra)
-        {
-            GerenciadorArquivoCompra gerenciadorArquivoCompraXML = new GerenciadorArquivoCompra(new ArquivoXML(DIRETORIO));
-            gerenciadorArquivoCompraXML.GerarArquivoDeCompra(compra);
-        }
-
         private static void alterarValor(Compra compra)
         {
             Console.WriteLine("Novo valor compra:");
@@ -110,8 +107,7 @@ namespace Arquivo
 
         private static Compra recuperarCompraArquivoXml()
         {
-            GerenciadorArquivoCompra gerenciadorArquivoCompraXML = new GerenciadorArquivoCompra(new ArquivoXML(DIRETORIO));
-            return gerenciadorArquivoCompraXML.RetornarCompraDeArquivo();
+            return gerenciadorArquivoXml.RetornarCompraDeArquivo();
         }
 
         private static Compra iniciarCompra()
@@ -132,16 +128,16 @@ namespace Arquivo
 
         public static void gerarMenu()
         {
-            Console.WriteLine("\t---MENU---");
-            Console.WriteLine("\t1-INICIAR COMPRA");
-            Console.WriteLine("\t2-RECUPERAR COMPRA ARQUIVO XML");
-            Console.WriteLine("\t3-RECUPERAR COMPRA ARQUIVO JSON");
-            Console.WriteLine("\t4-ALTERAR VALOR COMPRA");
-            Console.WriteLine("\t5-EXIBIR VALOR COMPRA");
-            Console.WriteLine("\t6-GRAVAR COMPRA EM ARQUIVO XML");
-            Console.WriteLine("\t7-GRAVAR COMPRA EM ARQUIVO JSON");
-            Console.WriteLine("\t8-FINLIZAR COMPRA");
-            Console.WriteLine("\t0-LIMPAR TELA");
+            Console.WriteLine("---MENU---");
+            Console.WriteLine("1-INICIAR COMPRA");
+            Console.WriteLine("2-RECUPERAR COMPRA ARQUIVO XML");
+            Console.WriteLine("3-RECUPERAR COMPRA ARQUIVO JSON");
+            Console.WriteLine("4-ALTERAR VALOR COMPRA");
+            Console.WriteLine("5-EXIBIR VALOR COMPRA");
+            Console.WriteLine("6-GRAVAR COMPRA EM ARQUIVO XML");
+            Console.WriteLine("7-GRAVAR COMPRA EM ARQUIVO JSON");
+            Console.WriteLine("8-FINLIZAR COMPRA");
+            Console.WriteLine("0-LIMPAR TELA");
         }
 
     }
